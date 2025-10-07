@@ -510,6 +510,13 @@
             <button type="button" id="sevenpriority" onclick="selectpriority(this)">その他</button>
         </div>
 
+    <!-- ▼「その他」を選んだときに出す入力欄（追記） -->
+    <div id="other-input" style="display:none; margin-top:10px;">
+      <label for="otherText" style="display:block; margin-bottom:6px;">内容をご入力ください（必須）</label>
+      <input type="text" id="otherText" placeholder="例：Yahoo!検索／知人からのLINE など"
+             style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; font-size:16px;">
+    </div>
+
         <button class="submit-button" onclick="submitForm()" div id="section-message">アンケート送信</button>
     </div>
 
@@ -543,15 +550,28 @@
             }
         }
 
-        function selectpriority(element) {
-            // 単一選択項目の処理コード
-            const buttons = document.querySelectorAll('.priority-buttons button');
-            buttons.forEach(button => button.classList.remove('active'));
+    function selectpriority(element) {
+      // 単一選択
+      const buttons = document.querySelectorAll('.priority-buttons button');
+      buttons.forEach(b => b.classList.remove('active'));
+      element.classList.add('active');
 
-            // 選択されたボタンだけにactiveクラスを追加
-            element.classList.add('active');
-            priorityCount = element.innerText;
-        }
+      selectedPriorityId = element.id;
+      priorityCount = element.innerText;
+
+      // 「その他」のときだけ入力欄を表示
+      const otherBox = document.getElementById('other-input');
+      const otherInput = document.getElementById('otherText');
+      if (selectedPriorityId === 'sevenpriority') {
+        otherBox.style.display = 'block';
+        // 既存値は保持。初回表示でフォーカス
+        setTimeout(() => otherInput.focus(), 0);
+      } else {
+        // それ以外は非表示＆入力クリア
+        otherBox.style.display = 'none';
+        otherInput.value = '';
+      }
+    }
 
         function submitForm() {
             priorityCount: priorityCount;
@@ -565,6 +585,18 @@
                 alert('当院の情報の入手先を教えてください。をご選択ください。');
                 return;
             }
+
+      // 「その他」選択時は入力必須
+      let messageValue = priorityCount;
+      if (selectedPriorityId === 'sevenpriority') {
+        const v = document.getElementById('otherText').value.trim();
+        if (!v) {
+          alert('「その他」を選択した場合、内容をご入力ください。');
+          document.getElementById('otherText').focus();
+          return;
+        }
+        messageValue = `その他（${v}）`;
+      }
 
             // LINEトークにメッセージを送信
             liff.sendMessages([{
