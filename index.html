@@ -498,6 +498,9 @@
         <h1>BIG HANDS<br>アンケートフォーム</h1>
         <div class="info-text">今後のサービス向上のためにご協力お願い致します。<br>以下選択後【アンケート送信】ボタンを押してください。</div>
 
+        <div class="label">お身体で気になることが、あれば教えてください。<span class="required">必須</span></div>
+        <textarea id="bodyConcern" rows="4" placeholder="例：肩こりがひどい／腰が痛い など"></textarea>
+
         <div class="label">当院の情報の入手先を教えてください。</div>
         <div class="priority-buttons">
             <button type="button" id="zeropriority" onclick="selectpriority(this)">看板</button>
@@ -581,6 +584,13 @@
             };
 
             // フォームデータのチェック
+            const bodyConcern = document.getElementById('bodyConcern').value.trim();
+            if (!bodyConcern) {
+                alert('お身体で気になることをご入力ください。');
+                document.getElementById('bodyConcern').focus();
+                return;
+            }
+
             if (!formData.priorityCount) {
                 alert('当院の情報の入手先を教えてください。をご選択ください。');
                 return;
@@ -601,7 +611,7 @@
             // LINEトークにメッセージを送信
             liff.sendMessages([{
                 type: 'text',
-                text: `≪アンケート≫\n\n【情報の入手先】\n・${formData.priorityCount}`
+                text: `≪アンケート≫\n\n【お身体で気になること】\n${bodyConcern}\n\n【情報の入手先】\n・${formData.priorityCount}`
             }]).then(() => {
                 /* メッセージ送信成功時の処理 */
                 alert('ご回答ありがとうございます。');
